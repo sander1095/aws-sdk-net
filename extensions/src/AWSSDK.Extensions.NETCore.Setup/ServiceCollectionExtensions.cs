@@ -75,7 +75,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="collection"></param>
         /// <param name="lifetime">The lifetime of the service client created. The default is Singleton.</param>
         /// <returns>Returns back the IServiceCollection to continue the fluent system of IServiceCollection.</returns>
-        public static IServiceCollection AddAWSService<T>(this IServiceCollection collection, ServiceLifetime lifetime = ServiceLifetime.Singleton) where T : IAmazonService
+        public static IServiceCollection AddAWSService<T>(this IServiceCollection collection, ServiceLifetime lifetime = ServiceLifetime.Singleton) where T : class, IAmazonService
         {
             return AddAWSService<T>(collection, null, lifetime);
         }
@@ -90,10 +90,10 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="options">The AWS options used to create the service client overriding the default AWS options added using AddDefaultAWSOptions.</param>
         /// <param name="lifetime">The lifetime of the service client created. The default is Singleton.</param>
         /// <returns>Returns back the IServiceCollection to continue the fluent system of IServiceCollection.</returns>
-        public static IServiceCollection AddAWSService<T>(this IServiceCollection collection, AWSOptions options, ServiceLifetime lifetime = ServiceLifetime.Singleton) where T : IAmazonService
+        public static IServiceCollection AddAWSService<T>(this IServiceCollection collection, AWSOptions options, ServiceLifetime lifetime = ServiceLifetime.Singleton) where T : class, IAmazonService
         {
             Func<IServiceProvider, object> factory =
-                new ClientFactory(typeof(T), options).CreateServiceClient;
+                new ClientFactory<T>(options).CreateServiceClient;
 
             var descriptor = new ServiceDescriptor(typeof(T), factory, lifetime);
             collection.Add(descriptor);
@@ -109,7 +109,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="collection"></param>
         /// <param name="lifetime">The lifetime of the service client created. The default is Singleton.</param>
         /// <returns>Returns back the IServiceCollection to continue the fluent system of IServiceCollection.</returns>
-        public static IServiceCollection TryAddAWSService<T>(this IServiceCollection collection, ServiceLifetime lifetime = ServiceLifetime.Singleton) where T : IAmazonService
+        public static IServiceCollection TryAddAWSService<T>(this IServiceCollection collection, ServiceLifetime lifetime = ServiceLifetime.Singleton) where T : class, IAmazonService
         {
             return TryAddAWSService<T>(collection, null, lifetime);
         }
@@ -124,10 +124,10 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="options">The AWS options used to create the service client overriding the default AWS options added using AddDefaultAWSOptions.</param>
         /// <param name="lifetime">The lifetime of the service client created. The default is Singleton.</param>
         /// <returns>Returns back the IServiceCollection to continue the fluent system of IServiceCollection.</returns>
-        public static IServiceCollection TryAddAWSService<T>(this IServiceCollection collection, AWSOptions options, ServiceLifetime lifetime = ServiceLifetime.Singleton) where T : IAmazonService
+        public static IServiceCollection TryAddAWSService<T>(this IServiceCollection collection, AWSOptions options, ServiceLifetime lifetime = ServiceLifetime.Singleton) where T : class, IAmazonService
         {
             Func<IServiceProvider, object> factory =
-                new ClientFactory(typeof(T), options).CreateServiceClient;
+                new ClientFactory<T>(options).CreateServiceClient;
 
             var descriptor = new ServiceDescriptor(typeof(T), factory, lifetime);
             collection.TryAdd(descriptor);

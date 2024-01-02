@@ -16,6 +16,7 @@ using System;
 #if AWS_ASYNC_API
 using System.Threading.Tasks;
 #endif
+using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.S3.Model;
 
@@ -76,6 +77,27 @@ namespace Amazon.S3
         Task<string> GetPreSignedURLAsync(GetPreSignedUrlRequest request);
 
         #endregion
+#endif
+
+#if NET8_0_OR_GREATER
+#pragma warning disable CA1033
+        /// <summary>
+        /// Create an instance of the default implementation of the service client interface.
+        /// </summary>
+        /// <param name="credentials">AWS credentials used to create the service client.</param>
+        /// <param name="configure">Callback to configure the service client config object.</param>
+        /// <returns></returns>
+        static IAmazonService IAmazonService.CreateServiceClient(AWSCredentials credentials, Action<Amazon.Runtime.ClientConfig> configure)
+        {
+            var config = new AmazonS3Config();
+            if(configure != null)
+            {
+                configure(config);
+            }
+
+            return credentials == null ? new AmazonS3Client(config) : new AmazonS3Client(credentials, config);
+        }
+#pragma warning restore CA1033
 #endif
     }
 }

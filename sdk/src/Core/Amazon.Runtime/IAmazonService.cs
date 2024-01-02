@@ -13,6 +13,8 @@
  * permissions and limitations under the License.
  */
 
+using System;
+
 namespace Amazon.Runtime
 {
     /// <summary>
@@ -28,5 +30,17 @@ namespace Amazon.Runtime
         {
             get;
         }
+
+#if NET8_0_OR_GREATER
+#pragma warning disable CA1000 // Do not declare static members on generic types
+        /// <summary>
+        /// Create an instance of the default implementation of the service client interface.
+        /// </summary>
+        /// <param name="credentials">AWS credentials used to create the service client.</param>
+        /// <param name="configure">Callback to configure the service client config object.</param>
+        /// <returns></returns>
+        static abstract IAmazonService CreateServiceClient(AWSCredentials credentials, Action<ClientConfig> configure);
+#pragma warning restore CA1000 // Do not declare static members on generic types
+#endif
     }
 }

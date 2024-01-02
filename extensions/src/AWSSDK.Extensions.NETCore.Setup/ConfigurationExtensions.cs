@@ -28,9 +28,6 @@ namespace Microsoft.Extensions.Configuration
     /// This class adds extension methods to IConfiguration making it easier to pull out
     /// AWS configuration options.
     /// </summary>
-#if NET8_0_OR_GREATER
-    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode(Amazon.Extensions.NETCore.Setup.InternalConstants.RequiresUnreferencedCodeMessage)]
-#endif
     public static class ConfigurationExtensions
     {
         /// <summary>
@@ -92,7 +89,7 @@ namespace Microsoft.Extensions.Configuration
 
             if (section == null)
                 return options;
-
+/*
             var clientConfigType = typeof(TConfig);
             var properties = clientConfigType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
             foreach (var element in section.GetChildren())
@@ -133,6 +130,7 @@ namespace Microsoft.Extensions.Configuration
                     };
                 }
             }
+*/
 
             if (!string.IsNullOrEmpty(section["Profile"]))
             {

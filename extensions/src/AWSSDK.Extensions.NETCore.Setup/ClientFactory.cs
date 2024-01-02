@@ -26,24 +26,19 @@ namespace Amazon.Extensions.NETCore.Setup
     /// <summary>
     /// The factory class for creating AWS service clients from the AWS SDK for .NET.
     /// </summary>
-#if NET8_0_OR_GREATER
-    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode(Amazon.Extensions.NETCore.Setup.InternalConstants.RequiresUnreferencedCodeMessage)]
-#endif
-    internal class ClientFactory
+    internal class ClientFactory<T> where T : class, IAmazonService
     {
         private static readonly Type[] EMPTY_TYPES = Array.Empty<Type>();
         private static readonly object[] EMPTY_PARAMETERS = Array.Empty<object>();
 
-        private Type _serviceInterfaceType;
         private AWSOptions _awsOptions;
 
         /// <summary>
         /// Constructs an instance of the ClientFactory
         /// </summary>
         /// <param name="type">The type object for the Amazon service client interface, for example IAmazonS3.</param>
-        internal ClientFactory(Type type, AWSOptions awsOptions)
+        internal ClientFactory(AWSOptions awsOptions)
         {
-            _serviceInterfaceType = type;
             _awsOptions = awsOptions;
         }
 
@@ -53,7 +48,7 @@ namespace Amazon.Extensions.NETCore.Setup
         /// </summary>
         /// <param name="provider">The dependency injection provider.</param>
         /// <returns>The AWS service client</returns>
-        internal object CreateServiceClient(IServiceProvider provider)
+        internal T CreateServiceClient(IServiceProvider provider)
         {
             var loggerFactory = provider.GetService<Microsoft.Extensions.Logging.ILoggerFactory>();
             var logger = loggerFactory?.CreateLogger("AWSSDK");
@@ -70,7 +65,7 @@ namespace Amazon.Extensions.NETCore.Setup
                 }
             }
 
-            return CreateServiceClient(logger, _serviceInterfaceType, options);
+            return CreateServiceClient(logger);
         }
 
         /// <summary>
@@ -79,20 +74,31 @@ namespace Amazon.Extensions.NETCore.Setup
         /// </summary>
         /// <param name="provider">The dependency injection provider.</param>
         /// <returns>The AWS service client</returns>
-        internal static IAmazonService CreateServiceClient(ILogger logger, Type serviceInterfaceType, AWSOptions options)
+        internal T CreateServiceClient(ILogger logger)
         {
-            PerformGlobalConfig(logger, options);
-            var credentials = CreateCredentials(logger, options);
+            PerformGlobalConfig(logger, _awsOptions);
+            var credentials = CreateCredentials(logger, _awsOptions);
 
-            if (!string.IsNullOrEmpty(options?.SessionRoleArn))
+            if (!string.IsNullOrEmpty(_awsOptions?.SessionRoleArn))
             {
-                credentials = new AssumeRoleAWSCredentials(credentials, options.SessionRoleArn, options.SessionName);
+                credentials = new AssumeRoleAWSCredentials(credentials, _awsOptions.SessionRoleArn, _awsOptions.SessionName);
             }
 
-            var config = CreateConfig(serviceInterfaceType, options);
-            var client = CreateClient(serviceInterfaceType, credentials, config);
-            return client as IAmazonService;
+#if NET8_0_OR_GREATER
+            var client = T.CreateServiceClient(credentials, ConfigureServiceClientConfig);
+#else
+            var config = CreateConfig(typeof(T), _awsOptions);
+            var client = CreateClient(typeof(T), credentials, config);
+#endif
+            return client as T;
         }
+
+#if NET8_0_OR_GREATER
+        private void ConfigureServiceClientConfig(IClientConfig clientConfig)
+        {
+
+        }
+#endif
 
         /// <summary>
         /// Performs all of the global settings that have been specified in AWSOptions.
@@ -127,30 +133,6 @@ namespace Amazon.Extensions.NETCore.Setup
                     logger?.LogDebug($"Configuring SDK LogResponsesSizeLimit: {AWSConfigs.LoggingConfig.LogResponsesSizeLimit}");
                 }
             }
-        }
-
-        /// <summary>
-        /// Creates the service client using the credentials and client config.
-        /// </summary>
-        /// <param name="credentials"></param>
-        /// <param name="config"></param>
-        /// <returns></returns>
-        private static AmazonServiceClient CreateClient(Type serviceInterfaceType, AWSCredentials credentials, ClientConfig config)
-        {
-            var clientTypeName = serviceInterfaceType.Namespace + "." + serviceInterfaceType.Name.Substring(1) + "Client";
-            var clientType = serviceInterfaceType.GetTypeInfo().Assembly.GetType(clientTypeName);
-            if (clientType == null)
-            {
-                throw new AmazonClientException($"Failed to find service client {clientTypeName} which implements {serviceInterfaceType.FullName}.");
-            }
-
-            var constructor = clientType.GetConstructor(new Type[] { typeof(AWSCredentials), config.GetType() });
-            if (constructor == null)
-            {
-                throw new AmazonClientException($"Service client {clientTypeName} missing a constructor with parameters AWSCredentials and {config.GetType().FullName}.");
-            }
-
-            return constructor.Invoke(new object[] { credentials, config }) as AmazonServiceClient;
         }
 
         /// <summary>
@@ -196,6 +178,31 @@ namespace Amazon.Extensions.NETCore.Setup
             }
 
             return credentials;
+        }
+
+#if !NET8_0_OR_GREATER
+        /// <summary>
+        /// Creates the service client using the credentials and client config.
+        /// </summary>
+        /// <param name="credentials"></param>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        private static AmazonServiceClient CreateClient(Type serviceInterfaceType, AWSCredentials credentials, ClientConfig config)
+        {
+            var clientTypeName = serviceInterfaceType.Namespace + "." + serviceInterfaceType.Name.Substring(1) + "Client";
+            var clientType = serviceInterfaceType.GetTypeInfo().Assembly.GetType(clientTypeName);
+            if (clientType == null)
+            {
+                throw new AmazonClientException($"Failed to find service client {clientTypeName} which implements {serviceInterfaceType.FullName}.");
+            }
+
+            var constructor = clientType.GetConstructor(new Type[] { typeof(AWSCredentials), config.GetType() });
+            if (constructor == null)
+            {
+                throw new AmazonClientException($"Service client {clientTypeName} missing a constructor with parameters AWSCredentials and {config.GetType().FullName}.");
+            }
+
+            return constructor.Invoke(new object[] { credentials, config }) as AmazonServiceClient;
         }
 
         /// <summary>
@@ -265,5 +272,6 @@ namespace Amazon.Extensions.NETCore.Setup
 
             return config;
         }
+#endif
     }
 }
