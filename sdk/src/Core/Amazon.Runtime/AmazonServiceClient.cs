@@ -506,20 +506,8 @@ namespace Amazon.Runtime
                         "Target resource path [{0}] has bidirectional characters, which are not supported" +
                         "by System.Uri and thus cannot be handled by the .NET SDK.", resourcePath));
                 }
-#endif          // Since S3 is the only service that is single encoded, we send the URL unencoded for special characters
-                // to match the previous behavior compatible with the SigV2 backend.
-                if (internalRequest.SignatureVersion == SignatureVersion.SigV2 && String.Equals(internalRequest.ServiceName, "AmazonS3"))
-                {
-#pragma warning disable CS0618 // Type or member is obsolete
-                    resourcePath = AWSSDKUtils.ResolveResourcePath(resourcePath, internalRequest.PathResources,skipEncodingValidPathChars);
-#pragma warning restore CS0618 // Type or member is obsolete
-                }
-                //for all other requests, we need to encode according to RFC3986 in accordance to smithy protocol tests
-                else
-                {
-                    resourcePath = AWSSDKUtils.ResolveResourcePathV2(resourcePath, internalRequest.PathResources);
-                }
-
+#endif
+                resourcePath = AWSSDKUtils.ResolveResourcePathV2(resourcePath, internalRequest.PathResources);
             }
 
             // Construct any sub resource/query parameter additions to append to the
@@ -559,9 +547,9 @@ namespace Amazon.Runtime
                             "Target resource path [{0}] has bidirectional characters, which are not supported" +
                             "by System.Uri and thus cannot be handled by the .NET SDK.", resourcePath));
 
-#pragma warning disable CS0612,CS0618 // Type or member is obsolete
+#pragma warning disable CS0612, CS0618 // Type or member is obsolete
                 parameterizedPath = string.Concat(AWSSDKUtils.ProtectEncodedSlashUrlEncode(resourcePath, skipEncodingValidPathChars), sb);
-#pragma warning restore CS0612,CS0618 // Type or member is obsolete
+#pragma warning restore CS0612, CS0618 // Type or member is obsolete
             }
 
             var hasSlash = url.AbsoluteUri.EndsWith("/", StringComparison.Ordinal) || parameterizedPath.StartsWith("/", StringComparison.Ordinal);
@@ -583,6 +571,7 @@ namespace Amazon.Runtime
             DontUnescapePathDotsAndSlashes(uri);
             return uri;
         }
+ 
 
         /// <summary>
         /// Patches the in-flight uri to stop it unescaping the path etc (what Uri did before
