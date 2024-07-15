@@ -9,6 +9,6 @@
         /// <summary>
         /// The ID of the scheme to use. This value matches the one returned by <see cref="IAuthScheme{T}.SchemeId"/>.
         /// </summary>
-        string SchemeId { get; }
+        string SchemeId { get; set; }
     }
 }

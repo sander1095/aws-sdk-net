@@ -12,13 +12,21 @@
     /// AWS credentials and the AWS SigV4 signer.
     /// </para>
     /// </summary>
-    public interface IAuthScheme<T> where T : BaseIdentity
+    public interface IAuthScheme<out T> where T : BaseIdentity
     {
         /// <summary>
         /// Unique identifier for the authentication scheme (e.g. "smithy.api#noAuth" or "aws.auth#sigv4").
         /// </summary>
         string SchemeId { get; }
 
-        // TODO: Include methods to retrieve identity resolver and signer for the current scheme (their interfaces haven't been created yet).
+        /// <summary>
+        /// Retrieves the identity resolver associated with this authentication scheme.
+        /// </summary>
+        IIdentityResolver IdentityResolver { get; }
+
+        /// <summary>
+        /// Retrieves the signer associated with this authentication scheme.
+        /// </summary>
+        ISigner Signer { get; }
     }
 }

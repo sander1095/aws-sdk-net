@@ -25,5 +25,9 @@ namespace Amazon.Runtime.Credentials.Internal
     {
         /// <inheritdoc/>
         public string SchemeId => "aws.auth#sigv4a";
+
+        #pragma warning disable CA1065
+        public IIdentityResolver IdentityResolver => throw new System.NotImplementedException();
+        #pragma warning restore CA1065
     }
 }
