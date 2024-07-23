@@ -229,13 +229,13 @@
             "name": "DeleteLifecycleConfiguration"
         },
         "GetBucketAcl": {
-            "name": "GetACL"
+            "name": "GetACL",
+            "keepOriginalOperation": true,
+            "deprecated": true,
+            "deprecatedMessage": "GetACL combines both GetBucketAcl and GetObjectAcl and is deprecated. Please use the separated GetObjectAcl and GetBucketAcl operations."
         },
         "GetBucketCors": {
             "name": "GetCORSConfiguration"
-        },
-        "GetObjectAcl": {
-            "exclude": true
         },
         "HeadBucket": {
             "internal": true
@@ -247,13 +247,13 @@
             "name": "ListVersions"
         },
         "PutBucketAcl": {
-            "name": "PutACL"
+            "name": "PutACL",
+            "keepOriginalOperation": true,
+            "deprecated": true,
+            "deprecatedMessage": "PutACL combines both PutBucketAcl and PutObjectAcl and is deprecated. Please use the separated PutObjectAcl and PutBucketAcl operations."
         },
         "PutBucketCors": {
             "name": "PutCORSConfiguration"
-        },
-        "PutObjectAcl": {
-            "exclude": true
         },
         "UploadPartCopy": {
             "name": "CopyPart"

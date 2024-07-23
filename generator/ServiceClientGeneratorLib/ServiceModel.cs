@@ -380,6 +380,8 @@ namespace ServiceClientGenerator
                 foreach (KeyValuePair<string, JsonData> kvp in DocumentRoot[OperationsKey])
                 {
                     Operation operation;
+                    Operation originalOperation = null;
+                    var modifiers = this._customizationModel.GetOperationModifiers(kvp.Key);
                     if (this.PaginatorsRoot != null && this.PaginatorsRoot[PaginationKey][kvp.Key] != null)
                     {
                         operation = new Operation(this, kvp.Key,
@@ -391,6 +393,13 @@ namespace ServiceClientGenerator
                     } 
                     else
                     {
+                        if (modifiers != null && modifiers.KeepOriginalOperation == true)
+                        {
+                            // it doesn't matter what we set the name as here because it will be overwritten in the Name getter
+                            // so instead we introduce a new property, originalName, that if set gets used in the name getter instead
+                            originalOperation = new Operation(this, kvp.Key, kvp.Value);
+                            originalOperation.OriginalName = kvp.Key;
+                        }
                         operation = new Operation(this, kvp.Key, kvp.Value);
                     }
                     if (operation.IsExcluded)
@@ -405,6 +414,10 @@ namespace ServiceClientGenerator
                     else
                     {
                         list.Add(operation);
+                        if (originalOperation != null)
+                        {
+                            list.Add(originalOperation);
+                        }
                     }
                 }
                 return list.OrderBy(x => x.Name).ToList();

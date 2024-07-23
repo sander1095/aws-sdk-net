@@ -1235,6 +1235,8 @@ namespace ServiceClientGenerator
             var modifiers = new OperationModifiers();
             if (operation[OperationModifiers.NameKey] != null && operation[OperationModifiers.NameKey].IsString)
                 modifiers.Name = (string)operation[OperationModifiers.NameKey];
+            if (operation[OperationModifiers.KeepOriginalOperationKey] != null && operation[OperationModifiers.KeepOriginalOperationKey].IsBoolean)
+                modifiers.KeepOriginalOperation = (bool)operation[OperationModifiers.KeepOriginalOperationKey];
             if (operation[OperationModifiers.ExcludeKey] != null && operation[OperationModifiers.ExcludeKey].IsBoolean)
                 modifiers.IsExcluded = (bool)operation[OperationModifiers.ExcludeKey];
             if (operation[OperationModifiers.InternalKey] != null && operation[OperationModifiers.InternalKey].IsBoolean)
@@ -1322,6 +1324,7 @@ namespace ServiceClientGenerator
             public const string DeprecatedMessageKey = "deprecatedMessage";
             public const string DocumentationKey = "documentation";
             public const string StopPaginationOnSameTokenKey = "stopPaginationOnSameToken";
+            public const string KeepOriginalOperationKey = "keepOriginalOperation";
 
             // within a marshal override for a shape; one or both may be present
             public const string MarshallLocationName = "marshallLocationName";
@@ -1347,6 +1350,11 @@ namespace ServiceClientGenerator
                 set;
             }
 
+            public bool KeepOriginalOperation
+            {
+                get;
+                set;
+            }
             /// <summary>
             /// Indicates if the operation should be marked internal in the client
             /// </summary>

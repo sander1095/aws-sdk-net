@@ -942,6 +942,88 @@ namespace AWSSDK_DotNet.IntegrationTests.Tests.S3
 
         [TestMethod]
         [TestCategory("S3")]
+        public void PutBucketPutObjectACLTest()
+        {
+            var bucketName = S3TestUtils.CreateBucketWithWait(Client, true);
+
+            Client.PutBucket(new PutBucketRequest
+            {
+                BucketName = bucketName,
+            });
+            var getBucketAclResponse = Client.GetBucketAcl(new GetBucketAclRequest
+            {
+                BucketName = bucketName,
+            });
+            S3TestUtils.WaitForBucket(Client, bucketName);
+            var response = Client.PutBucketAcl(new PutBucketAclRequest
+            {
+                BucketName = bucketName,
+                AccessControlPolicy = new S3AccessControlList
+                {
+                    Grants = new List<S3Grant>()
+                    {
+                        new S3Grant()
+                        {
+                            Grantee = new S3Grantee()
+                            { 
+                                URI = "http://acs.amazonaws.com/groups/global/AllUsers",
+                            },
+                            Permission = S3Permission.READ
+                        },
+                    },
+                    Owner = getBucketAclResponse.Owner,  
+                },
+            });
+            var getBucketAclResponse2 = Client.GetBucketAcl(new GetBucketAclRequest
+            {
+                BucketName = bucketName,
+            });
+            getBucketAclResponse2.Grants.ForEach(grant =>
+            {
+                Assert.IsTrue(grant.Grantee.URI == "http://acs.amazonaws.com/groups/global/AllUsers");
+                Assert.IsTrue(grant.Permission == S3Permission.READ);
+            });
+
+            Client.PutObject(new PutObjectRequest
+            {
+                Key = "putobjectwithacl",
+                ContentBody = "randomstuff",
+                BucketName = bucketName,
+            });
+            Client.PutObjectAcl(new PutObjectAclRequest
+            {
+                BucketName = bucketName,
+                Key = "putobjectwithacl",
+                AccessControlPolicy = new S3AccessControlList
+                {
+                    Grants = new List<S3Grant>()
+                    {
+                        new S3Grant()
+                        {
+                            Grantee = new S3Grantee()
+                            {
+                                URI = "http://acs.amazonaws.com/groups/global/AllUsers",
+                            },
+                            Permission = S3Permission.READ
+                        },
+                    },
+                    Owner = getBucketAclResponse.Owner,
+                },
+            });
+            var getObjectAclResponse = Client.GetObjectAcl(new GetObjectAclRequest
+            {
+                Key = "putobjectwithacl",
+                BucketName = bucketName,
+            });
+
+            getObjectAclResponse.Grants.ForEach(grant =>
+            {
+                Assert.IsTrue(grant.Grantee.URI == "http://acs.amazonaws.com/groups/global/AllUsers");
+                Assert.IsTrue(grant.Permission == S3Permission.READ);
+            });
+        }
+        [TestMethod]
+        [TestCategory("S3")]
         public void PutObjectWithACL()
         {
             PutObjectRequest request = new PutObjectRequest()
@@ -985,9 +1067,11 @@ namespace AWSSDK_DotNet.IntegrationTests.Tests.S3
                     {
                         new S3Grant
                         {
-                            Grantee = new S3Grantee { URI = "http://acs.amazonaws.com/groups/global/AuthenticatedUsers" },
-                            Permission = S3Permission.READ
-                        }
+                            Grantee = new S3Grantee { URI = "http://acs.amazonaws.com/groups/global/AuthenticatedUsers"},
+                            Permission = S3Permission.READ,
+                            
+                        },
+                        
                     },
                     Owner = acl.Owner
                 },
