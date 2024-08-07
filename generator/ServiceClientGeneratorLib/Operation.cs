@@ -18,7 +18,6 @@ namespace ServiceClientGenerator
         /// The name of the operation as found in the json model
         /// </summary>
         readonly string name;
-        private string originalName;
 
         private OperationPaginatorConfig _operationPaginatorConfig;
 
@@ -60,12 +59,6 @@ namespace ServiceClientGenerator
         {
             get
             {
-                // originalName is only set when when an operation is renamed and the original operation still needs 
-                // to be generated. For example, the deprecated GetACL and GetBucketACL operations in S3.
-                if (!string.IsNullOrEmpty(this.originalName))
-                {
-                    return originalName;
-                }
                 var modifiers = this.model.Customizations.GetOperationModifiers(ShapeName);
                 if (modifiers != null && !string.IsNullOrEmpty(modifiers.Name))
                     return modifiers.Name;
@@ -74,17 +67,7 @@ namespace ServiceClientGenerator
             }
         }
 
-        public string OriginalName
-        {
-            get
-            {
-                return originalName;
-            }
-            set
-            {
-                this.originalName = value;
-            }
-        }
+
         /// <summary>
         /// Returns the raw shape name without customization
         /// </summary>
@@ -116,11 +99,7 @@ namespace ServiceClientGenerator
             {
                 if (data[ServiceModel.DeprecatedKey] != null && data[ServiceModel.DeprecatedKey].IsBoolean)
                     return (bool)data[ServiceModel.DeprecatedKey];
-                // customization to deprecate GetACL but not GetBucketACL. This is tricky because both operations are generated from the same shape
-                // checking against the Name property is the only way to ensure both GetACL and GetBucketACL generate a deprecation message.
-                // TODO : Remove this once GetACL and PutACL are removed.
-                if (this.Name == "GetACL" || this.Name == "PutACL")
-                    return true;
+
                 return false;
             }
         }

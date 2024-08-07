@@ -115,6 +115,18 @@ namespace Amazon.S3.Internal
                 result.Bucket = request.BucketName;
                 return result;
             }
+            if (requestContext.RequestName == "GetACLRequest") {
+                result.UseS3ExpressControlEndpoint = true;
+                var request = (GetACLRequest)requestContext.OriginalRequest;
+                result.Bucket = request.BucketName;
+                return result;
+            }
+            if (requestContext.RequestName == "PutACLRequest") {
+                result.UseS3ExpressControlEndpoint = true;
+                var request = (PutACLRequest)requestContext.OriginalRequest;
+                result.Bucket = request.BucketName;
+                return result;
+            }
 
             // Assign staticContextParams and contextParam per operation
             if (requestContext.RequestName == "AbortMultipartUploadRequest") {
@@ -244,12 +256,6 @@ namespace Amazon.S3.Internal
             if (requestContext.RequestName == "DeletePublicAccessBlockRequest") {
                 result.UseS3ExpressControlEndpoint = true;
                 var request = (DeletePublicAccessBlockRequest)requestContext.OriginalRequest;
-                result.Bucket = request.BucketName;
-                return result;
-            }
-            if (requestContext.RequestName == "GetACLRequest") {
-                result.UseS3ExpressControlEndpoint = true;
-                var request = (GetACLRequest)requestContext.OriginalRequest;
                 result.Bucket = request.BucketName;
                 return result;
             }
@@ -493,12 +499,6 @@ namespace Amazon.S3.Internal
                 var request = (ListVersionsRequest)requestContext.OriginalRequest;
                 result.Bucket = request.BucketName;
                 result.Prefix = request.Prefix;
-                return result;
-            }
-            if (requestContext.RequestName == "PutACLRequest") {
-                result.UseS3ExpressControlEndpoint = true;
-                var request = (PutACLRequest)requestContext.OriginalRequest;
-                result.Bucket = request.BucketName;
                 return result;
             }
             if (requestContext.RequestName == "PutBucketRequest") {

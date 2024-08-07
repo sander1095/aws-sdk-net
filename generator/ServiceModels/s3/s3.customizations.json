@@ -228,12 +228,6 @@
         "DeleteBucketLifecycle": {
             "name": "DeleteLifecycleConfiguration"
         },
-        "GetBucketAcl": {
-            "name": "GetACL",
-            "keepOriginalOperation": true,
-            "deprecated": true,
-            "deprecatedMessage": "GetACL combines both GetBucketAcl and GetObjectAcl and is deprecated. Please use the separated GetObjectAcl and GetBucketAcl operations."
-        },
         "GetBucketCors": {
             "name": "GetCORSConfiguration"
         },
@@ -245,12 +239,6 @@
         },
         "ListObjectVersions": {
             "name": "ListVersions"
-        },
-        "PutBucketAcl": {
-            "name": "PutACL",
-            "keepOriginalOperation": true,
-            "deprecated": true,
-            "deprecatedMessage": "PutACL combines both PutBucketAcl and PutObjectAcl and is deprecated. Please use the separated PutObjectAcl and PutBucketAcl operations."
         },
         "PutBucketCors": {
             "name": "PutCORSConfiguration"
