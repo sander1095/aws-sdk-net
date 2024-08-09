@@ -17,13 +17,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
-
 using Amazon.CloudFront.Model;
 using Amazon.Runtime;
 using Amazon.Util;
-
-using ThirdParty.BouncyCastle.OpenSsl;
+using Org.BouncyCastle.OpenSsl;
 using System.Globalization;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Security;
 
 #pragma warning disable 1591
 
@@ -519,7 +520,11 @@ namespace Amazon.CloudFront
             RSAParameters rsaParams;
             try
             {
-                rsaParams = new PemReader(privateKeyReader).ReadPrivatekey();
+                var pemReader = new PemReader(privateKeyReader);
+                var keyPair = pemReader.ReadObject() as AsymmetricCipherKeyPair;
+                var privateKey = keyPair.Private as RsaPrivateCrtKeyParameters;
+                rsaParams = DotNetUtilities.ToRSAParameters(privateKey);
+
             }
             catch (Exception e)
             {
