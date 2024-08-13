@@ -13,12 +13,14 @@
     <icon>images\AWSLogo.png</icon>
     <dependencies>
       <group targetFramework="net472">
-        <dependency id="AWSSDK.Core" version="4.0.0.0-preview" />
-        <dependency id="AWSSDK.CloudFront" version="4.0.0.0-preview" />
+        <dependency id="AWSSDK.Core" version="4.0.0-preview" />
+        <dependency id="AWSCRT-AUTH" version="0.4.4" />
+        <dependency id="AWSCRT-CHECKSUMS" version="0.4.4" />
       </group>
       <group targetFramework="netstandard2.0">
-        <dependency id="AWSSDK.Core" version="4.0.0.0-preview" />
-        <dependency id="AWSSDK.CloudFront" version="4.0.0.0-preview" />
+        <dependency id="AWSSDK.Core" version="4.0.0-preview" />
+        <dependency id="AWSCRT-AUTH" version="0.4.4" />
+        <dependency id="AWSCRT-CHECKSUMS" version="0.4.4" />
       </group>
     </dependencies>
 

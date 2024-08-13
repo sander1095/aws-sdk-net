@@ -42,10 +42,22 @@ namespace Amazon.EC2.Model
             RSAParameters rsaParams;
             try
             {
-                //rsaParams = new PemReader(new StringReader(rsaPrivateKey.Trim())).ReadPrivatekey();
-                var keyPair = new Org.BouncyCastle.OpenSsl.PemReader(new StringReader(rsaPrivateKey.Trim())).ReadObject() as AsymmetricCipherKeyPair;
-                var privateKey = keyPair.Private as RsaPrivateCrtKeyParameters;
-                rsaParams = DotNetUtilities.ToRSAParameters(privateKey);
+                var pemReader = new PemReader(new StringReader(rsaPrivateKey.Trim()));
+                var keyPair = pemReader.ReadObject();
+                if (keyPair is RsaPrivateCrtKeyParameters)
+                {
+                    rsaParams = DotNetUtilities.ToRSAParameters((RsaPrivateCrtKeyParameters)keyPair);
+                }
+                else if (keyPair is AsymmetricCipherKeyPair)
+                {
+                    var asymmetricKeyPair = keyPair as AsymmetricCipherKeyPair;
+                    var privateKey = asymmetricKeyPair.Private as RsaPrivateCrtKeyParameters;
+                    rsaParams = DotNetUtilities.ToRSAParameters(privateKey);
+                }
+                else
+                {
+                    throw new AmazonClientException("Unknown key type");
+                }
             }
             catch (Exception e)
             {

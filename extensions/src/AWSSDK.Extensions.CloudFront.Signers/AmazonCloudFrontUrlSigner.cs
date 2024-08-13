@@ -521,10 +521,21 @@ namespace Amazon.CloudFront
             try
             {
                 var pemReader = new PemReader(privateKeyReader);
-                var keyPair = pemReader.ReadObject() as AsymmetricCipherKeyPair;
-                var privateKey = keyPair.Private as RsaPrivateCrtKeyParameters;
-                rsaParams = DotNetUtilities.ToRSAParameters(privateKey);
-
+                var keyPair = pemReader.ReadObject();
+                if (keyPair is RsaPrivateCrtKeyParameters)
+                {
+                    rsaParams = DotNetUtilities.ToRSAParameters((RsaPrivateCrtKeyParameters)keyPair);
+                }
+                else if (keyPair is AsymmetricCipherKeyPair)
+                {
+                    var asymmetricKeyPair = keyPair as AsymmetricCipherKeyPair;
+                    var privateKey = asymmetricKeyPair.Private as RsaPrivateCrtKeyParameters;
+                    rsaParams = DotNetUtilities.ToRSAParameters(privateKey);
+                }
+                else
+                {
+                    throw new AmazonClientException("Unknown key type");
+                }
             }
             catch (Exception e)
             {

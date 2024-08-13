@@ -18,10 +18,12 @@
       <group targetFramework="net472">
         <dependency id="AWSSDK.Core" version="4.0.0.0-preview" />
         <dependency id="AWSSDK.CloudFront" version="4.0.0.0-preview" />
+        <dependency id="Portable.BouncyCastle" version="1.9.0" />
       </group>
       <group targetFramework="netstandard2.0">
         <dependency id="AWSSDK.Core" version="4.0.0.0-preview" />
         <dependency id="AWSSDK.CloudFront" version="4.0.0.0-preview" />
+        <dependency id="Portable.BouncyCastle" version="1.9.0" />
       </group>
     </dependencies>
 
