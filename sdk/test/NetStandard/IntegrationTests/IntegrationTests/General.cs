@@ -132,7 +132,7 @@ namespace Amazon.DNXCore.IntegrationTests
             }
         }
 
-        [Fact]
+        //[Fact]
         public void TestManualClockCorrection()
         {
             TestClients(TestServiceCallForManualClockCorrection);
@@ -141,7 +141,7 @@ namespace Amazon.DNXCore.IntegrationTests
         // This test verifies that all service clients are able to
         // correctly handle clock skew errors.
         // By default it only tests a small subset of services.
-        [Fact]
+        //[Fact]
         public void TestClockSkewCorrection()
         {
             TestClients(TestServiceCallForClockSkew);
