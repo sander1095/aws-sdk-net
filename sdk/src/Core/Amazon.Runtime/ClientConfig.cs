@@ -928,9 +928,31 @@ namespace Amazon.Runtime
 #endif
         }
 
+        /// <summary>
+        /// Returns the current UTC now after clock correction for AWSConfigs.ManualClockCorrection.
+        /// </summary>
+        [Obsolete("Please use CorrectClockSkew.GetCorrectedUtcNowForEndpoint(string endpoint) instead.", false)]
+        public DateTime CorrectedUtcNow
+        {
+            get
+            {
+                // Passing null will cause GetCorrectedUtcNowForEndpoint to skip calculating ClockSkew based on 
+                // endpoint and only use ManualClockCorrection if is set.
+                return CorrectClockSkew.GetCorrectedUtcNowForEndpoint(null);
+            }
+        }
 
-
-
+        /// <summary>
+        /// Wrapper around <seealso cref="AWSConfigs.ManualClockCorrection"/>
+        /// </summary>
+        [Obsolete("Please use CorrectClockSkew.GetClockCorrectionForEndpoint(string endpoint) instead.", false)]
+        public TimeSpan ClockOffset
+        {
+            get
+            {
+                return AWSConfigs.ManualClockCorrection.GetValueOrDefault();
+            }
+        }
 
         /// <summary>
         /// Gets and sets the DisableHostPrefixInjection flag. If true, host prefix injection will be disabled for this client, the default value of this flag is false. 
